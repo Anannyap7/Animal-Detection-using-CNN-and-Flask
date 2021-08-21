@@ -1,0 +1,225 @@
+<html>
+    <head>
+            <title>CNN Using Flask</title>
+            <style>
+                #custom-button {
+                    padding: 12px;
+                    color: whitesmoke;
+                    background-color: #5a02de;
+                    border: 1px solid #5a02de;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 27%;
+                }
+
+                #custom-button:hover {
+                    background-color: #7012fc;
+                }
+
+                #custom-text{
+                    margin: left 25px;
+                    font-family: Helvetica;
+                    color:darkgray;
+                }
+                .heading {
+                    text-align: center;
+                }
+                .subheading-left {
+                    text-align: left;
+                }
+                .subheading-right {
+                    text-align: right;
+                }
+                h1 {
+                    padding: 10px;
+                    display: inline-flex;
+                    border: 3px solid #5a02de;
+                    color: floralwhite;
+                    font-family: Arial, Helvetica, sans-serif;
+                }
+                h2 {
+                    padding: 10px;
+                    display: inline-flex;
+                    background-color: #5a02de;
+                    color: floralwhite;
+                    border: 3px solid #5a02de;
+                    border-radius: 5px;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 24px;
+                }
+                #text {
+                    color: floralwhite;
+                    font-family: Arial, Helvetica, sans-serif;
+                    font-size: 18px;
+                    float:left;
+                    width:35%;
+                    line-height: 1.6;
+                    margin-left: 10%;
+                }
+                .topic {
+                    color: floralwhite;
+                    font-size: 20px;
+                    font-style: italic;
+                    font-family: Arial, Helvetica, sans-serif;
+                    text-decoration-line: underline;
+                    text-decoration-color: #5a02de;
+                    margin-left: 27%;
+                }
+                .box {
+                    display: flex;
+                    flex-direction: column;
+                    line-height: 45px;
+                }
+                #align-span {
+                    display: flex;
+                    flex-direction: column;    /* align flex items vertically */
+                    justify-content: center;   /* center items vertically, in this case */
+                    align-items: center;       /* center single-line items horizontally, in this case */
+                    align-content: center;     /* center multi-line items horizontally, in this case */
+                    margin-right: 21%;
+                }
+                #custom-submit {
+                    padding: 7px;
+                    color: whitesmoke;
+                    background-color: transparent;
+                    border: 2px solid #5a02de;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    margin-left: 27%;
+                    font-size: 18px;
+                }
+                #custom-submit:hover {
+                    background-color: #5a02de;
+                }
+                #result {
+            		color:floralwhite; 
+            		font-family: Helvetica; 
+            		font-size: 18px; 
+            		border:2px solid #5a02de; 
+            		border-radius:5px; 
+            		padding: 10px;
+            		line-height: 70px;
+            		margin-left: 26%;
+            	}
+            </style>
+    </head>
+
+    <body style = "background-color: #232424; background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url({{ url_for ('static', filename = 'neural.png') }});
+    background-size: cover; background-position: center; height: fit-content; width: fit-content;">
+
+        <div class="heading">
+            <b><h1>ANIMAL RECOGNITION SYSTEM USING CNN</h1></b>
+        </div>
+
+        <br>
+
+        <div style="width: 100%;">
+            <div class="subheading-left">
+                <h2 style="float: left; margin-left: 10%;">ANIMAL RECOGNITION</h2>
+            </div>
+    
+            <div class="subheading-right">
+                <h2 style="margin-right: 29%;">PREDICTION</h2>
+            </div>
+        </div>
+    
+        <div style="width: 100%;">
+    
+            <div id = "text">
+                This is an integration of the CNN model and flask made by 
+                ANANNYA POPAT (19BBS0048) for detecting the species of an image of 
+                animal uploaded. <br>
+                The species can be segregrated into 5 categories: bears, crows,
+                elephants, racoons and rats. Upload an image concerning any of
+                these species, and my CNN (Image classifier) model will try
+                it's best to determine the correct species of the image
+                uploaded according to the above mentioned rules.
+            </div>
+
+            <div class="box">
+
+                <div>
+                    {% if uploaded_image %}
+                    <div>
+                        <div id="align-span">
+                            <img src="{{ uploaded_image }}" width="200">
+                        </div>
+                        <span id="result">{{result}}</span>
+                    </div>
+                    {% else %}
+                    
+                    <form action = "/predict" id="upload-file" method="post" enctype="multipart/form-data">
+                        <div class="topic">
+                            Please upload an image here!
+                        </div>
+                        
+                        <input type="file" multiple="false" accept="image/*" id = "real-file" name="image" hidden="hidden"  onchange="loadFile(event)"/>
+                        <button type="button" id = "custom-button" style="size: 36px;"> CHOOSE AN IMAGE </button>
+                        <span id="custom-text"> No file chosen yet! </span>
+                        
+                        <div>
+                            <br style="line-height: 20px;">
+                            <button type="submit" id="custom-submit">PREDICT</button>
+                        </div>
+                    </form>
+                    {% endif %}  
+                </div>
+
+                <br style="line-height: 10px;">
+
+                <div id="align-span">
+                    <img id="output" width="200"/>
+                </div>
+
+            </div>
+    
+        </div>
+
+        <!-- We create an actual button using the file type and use the functionality of this button in the custom button, thus we hide it -->
+        <!-- multiple = false prohibits uploading multiple files -->
+        <!-- All kinds of image files are accepted using * (only image files) -->
+        <!-- onchange is an event handler which is triggered on uploading a file -->
+
+        <!-- Script is used to include JavaScript code --> 
+         <script type="text/JavaScript">
+            
+            // create an instance for each of the above
+            const realFileBtn = document.getElementById("real-file");
+            const customBtn = document.getElementById("custom-button");
+            const customTxt = document.getElementById("custom-text");
+
+            // To call the event handler to make the button work
+            customBtn.addEventListener("click", function() {
+                realFileBtn.click()  //This will virtually click on the actual button
+            });
+
+            // To display the filename in the custom text span -->
+            // when the value of the file changes, then the event listener is triggered
+            realFileBtn.addEventListener("change", function() {
+                if (realFileBtn.value) //if the file is chosen (if the file has a value)
+                {
+                    // The regular expression inside match will extract the filename from the filepath
+                    customTxt.innerHTML = realFileBtn.value.match(/[\/\\]([\w\d\s\.\-\(\)]+)$/)[1];
+                    var loadFile = function(event) {
+                        var image = document.getElementById('output');
+                        image.src = URL.createObjectURL(event.target.files[0])
+                    };
+                    
+                }
+                else
+                {
+                    customTxt.innerHTML = "No file chosen yet!";
+                }
+            });
+
+            // To Display the image uploaded
+            var loadFile = function(event) {
+	            var image = document.getElementById('output');
+	            image.src = URL.createObjectURL(event.target.files[0]);
+            };
+            
+            
+       </script>
+    
+    </body>
+</html>
